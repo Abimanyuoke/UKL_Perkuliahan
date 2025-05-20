@@ -3,12 +3,9 @@ import cors from 'cors'
 import swaggerJsDoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
 import path from 'path'
-import dotenv from 'dotenv'
-dotenv.config()
 
-
-import MovieRoute from './routers/movieRoute'
 import UserRoute from './routers/userRoute'
+
 import { PORT } from './global'
 
 const app = express()
@@ -45,8 +42,7 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsDoc(swaggerOptions)
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 
-app.use(`/`, MovieRoute)
-app.use(`/`, UserRoute)
+app.use(`/user`, UserRoute)
 
 // Set public folder as static
 app.use(express.static(path.join(__dirname, '..', 'public')));

@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,57 +7,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-enum Role {
-  ADMIN
-  CASHIER
-  USER
+enum Gender {
+  PRIA
+  WANITA
 }
+
 
 model User {
   id              Int      @id @default(autoincrement())
   uuid            String   @unique @default("")
   name            String   @default("")
+  username        String   @unique @default("")
   email           String   @unique @default("")
   password        String   @default("")
-  role            Role     @default(USER)
+  telepon         String   @default("")
+  alamat          String   @default("")
+  profile_picture String   @default("")
+  gender          Gender   @default(PRIA)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  transaksi       Transaksi[]
+  matkul          MatKul[]
 }
-
-model Movie {
-  id              Int      @id @default(autoincrement())
-  uuid            String   @unique @default("")
-  title           String   @default("")
-  voteaverage     String   @default("")
-  overview        String   @default("")
-  picture         String   @default("")
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  transaksi       Transaksi[]
-  transaksiList   TransaksiList[]
-}
-
-model Transaksi {
-  transaksiId Int @id @default(autoincrement())
-  userId Int?
-  movieId Int?
-  qty Int @default(0)
+model MatKul {
+  id          Int      @id @default(autoincrement())
+  uuid        String   @unique @default("")
+  name_matkul String   @default("")
+  SKS         Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  movie Movie? @relation(fields: [movieId], references: [id])
-  user User?   @relation(fields: [userId], references: [id])
-  transaksiList TransaksiList[]
-}
-model TransaksiList {
-  id              Int      @id @default(autoincrement())
-  uuid            String   @unique @default("")
-  transaksiId     Int?
-  movieId         Int?
-  qty             Int      @default(0)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  movie Movie?     @relation(fields: [movieId], references: [id])
-  Transaksi Transaksi[]
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
 }

@@ -6,7 +6,8 @@ const addDataSchema = Joi.object({
     name: Joi.string().required(),
     email: Joi.string().email().required(),
     password: Joi.string().min(3).alphanum().required(),
-    role: Joi.string().valid('ADMIN','CASHIER', 'USER').uppercase().required(),
+    role: Joi.string().valid('MANAGER','CASHIER').uppercase().required(),
+    profile_picture: Joi.allow().optional(),
     user: Joi.optional()
 })
 
@@ -15,7 +16,8 @@ const editDataSchema = Joi.object({
     name: Joi.string().optional(),
     email: Joi.string().optional(),
     password: Joi.string().optional(),
-    role: Joi.string().valid('ADMIN','CASHIER','USER').uppercase().optional(),
+    role: Joi.string().valid('MANAGER','CASHIER').uppercase().optional(),
+    profile_picture: Joi.allow().optional(),
     user: Joi.optional()
 })
 
@@ -59,7 +61,7 @@ export const verifyAuthentication = (request: Request, response: Response, next:
 
     if (error) {
         /** if there is an error, then give a response like this */
-        return response.status(400).json({
+        return response.status(200).json({
             status: false,
             message: error.details.map(it => it.message).join()
         })

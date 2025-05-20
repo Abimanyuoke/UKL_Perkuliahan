@@ -1,20 +1,20 @@
 import express from "express"
-import { getAllUsers, createUser, updateUser, deleteUser,  authentication, getUserById, logout } from "../controllers/userController"
+import { getAllUsers, createUser, updateUser, deleteUser, changePicture, authentication, getUserById } from "../controllers/userController"
 import { verifyAddUser, verifyEditUser, verifyAuthentication } from "../middlewares/userValidation"
+import uploadFile from "../middlewares/profilUpload"
 import { verifyToken, verifyRole } from "../middlewares/authorization"
 
 const app = express()
 app.use(express.json())
 
-app.get(`/getuser`, [verifyToken, verifyRole(["ADMIN"])], getAllUsers)
-app.get(`/profile`, [verifyToken, verifyRole(["ADMIN"])], getUserById)
-// app.post(`/auth/register`,[verifyToken, verifyRole(["ADMIN"]) ,verifyAddUser], createUser)
-app.post(`/auth/register`, [verifyAddUser], createUser)
-// app.post(`/`, [verifyToken, verifyRole(["ADMIN"]), verifyAddUser], createUser)
-app.put(`/:id`, [verifyToken, verifyRole(["ADMIN"]), verifyEditUser], updateUser)
-app.delete(`/:id`, [verifyToken, verifyRole(["ADMIN"])], deleteUser)
-app.post(`/auth/login`, [verifyAuthentication], authentication)
-app.post(`/auth/logout`, verifyToken, logout)
+app.get(`/`, [verifyToken, verifyRole(["MANAGER"])], getAllUsers)
+app.get(`/profile`, [verifyToken, verifyRole(["CASHIER", "MANAGER"])], getUserById)
+app.post(`/`, uploadFile.single("picture"), verifyAddUser, createUser)
+// app.post(`/`, [verifyToken, verifyRole(["MANAGER"]), uploadFile.single("picture"), verifyAddUser], createUser)
+app.put(`/:id`, [verifyToken, verifyRole(["CASHIER", "MANAGER"]), uploadFile.single("picture"), verifyEditUser], updateUser)
+app.put(`/profile/:id`, [verifyToken, verifyRole(["CASHIER", "MANAGER"]), uploadFile.single("picture")], changePicture)
+app.delete(`/:id`, [verifyToken, verifyRole(["MANAGER"])], deleteUser)
+app.post(`/login`, [verifyAuthentication], authentication)
 
 export default app
 

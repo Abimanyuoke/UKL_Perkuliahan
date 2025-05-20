@@ -2,13 +2,13 @@ import { Request } from "express";
 import multer from "multer";
 import { BASE_URL } from "../global";
 
-/** define storage configuration of menu picture  */
+/** define storage configuration of profil image  */
 const storage = multer.diskStorage({
     destination: (request: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
-        /** define location of uploaded picture, make sure that you have create a "public" folder in root folder.
-         * then create folder "menu_picture" inside of "public folder"
+        /** define location of uploaded image, make sure that you have create a "public" folder in root folder.
+         * then create folder "profil-picture" inside of "public folder"
          */
-        cb(null, `${BASE_URL}/public/movie_picture/`)
+        cb(null, `${BASE_URL}/public/profile_picture/`)
     },
     filename: (request: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
         /** define file name of uploaded file */
