@@ -7,41 +7,45 @@ const axiosInstance = axios.create({
 })
 
 
-export const get = async (url: string, token: string) => {
-    try {
-        let headers: any = {
-            "Authorization": `Bearer ${token}` || '',
-        }
-        let result = await axiosInstance.get(url, {
-            headers
-        })
+// export const get = async (url: string,) => {
+//     try {
+//         let headers: any = {
+//         }
+//         let result = await axiosInstance.get(url, {
+//             headers
+//         })
 
-        return {
-            status: true,
-            data: result.data
-        }
-    } catch (error) {
-        const err = error as AxiosError<{ message: string, code: number }>
-        if (err.response) {
-            console.log(err.response.data.message);
-            return {
-                status: false,
-                message: `${err.code}: something wrong`
-            }
-        }
-        console.log(err.response);
-        return {
-            status: false,
-            message: `Something were wrong: ${error}`
-        }
-    }
+//         return {
+//             status: true,
+//             data: result.data
+//         }
+//     } catch (error) {
+//         const err = error as AxiosError<{ message: string, code: number }>
+//         if (err.response) {
+//             console.log(err.response.data.message);
+//             return {
+//                 status: false,
+//                 message: `${err.code}: something wrong`
+//             }
+//         }
+//         console.log(err.response);
+//         return {
+//             status: false,
+//             message: `Something were wrong: ${error}`
+//         }
+//     }
+// }
+
+export const get = async (url: string) => {
+    const response = await axios.get(url);
+    return response; // ✅ bukan response.data
 }
 
-export const post = async (url: string, data: string | FormData, token: string) => {
+export const post = async (url: string, data: string | FormData) => {
     try {
         const typed: string = (typeof data == 'string') ? "application/json" : "multipart/form-data"
         let headers: any = {
-            "Authorization": `Bearer ${token}` || '',
+            // "Authorization": `Bearer ${token}` || '',
             "Content-Type": typed
         }
 

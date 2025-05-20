@@ -1,6 +1,6 @@
 "use client"
 
-import { IMenu } from "@/app/types"
+import { IUser } from "@/app/types"
 import { BASE_API_URL } from "@/global"
 import { put } from "@/lib/bridge"
 import { getCookies } from "@/lib/client-cookies"
@@ -13,47 +13,47 @@ import Modal from "@/components/modal"
 import Select from "@/components/select"
 import FileInput from "@/components/fileInput"
 
-const EditMenu = ({ selectedMenu }: { selectedMenu: IMenu }) => {
+const EditUser = ({ selectedUser }: { selectedUser: IUser }) => {
     const [isShow, setIsShow] = useState<boolean>(false)
-    const [menu, setMenu] = useState<IMenu>({ ...selectedMenu })
+    const [user, setUser] = useState<IUser>({ ...selectedUser })
     const router = useRouter()
     const TOKEN = getCookies("token") || ""
     const [file, setFile] = useState<File | null>(null)
     const formRef = useRef<HTMLFormElement>(null)
     const openModal = () => {
-        setMenu({ ...selectedMenu })
+        setUser({ ...selectedUser })
         setIsShow(true)
         if (formRef.current) formRef.current.reset()
     }
     const handleSubmit = async (e: FormEvent) => {
         try {
             e.preventDefault()
-            const url = `${BASE_API_URL}/menu/${selectedMenu.id}`
-            const { name, price, description, category } = menu
+            const url = `${BASE_API_URL}/update/${selectedUser.id}`
+            const { nama_pelanggan, telepon, gender, alamat  } = user
             const payload = new FormData()
-            payload.append("name", name || "")
-            payload.append("price", price !== undefined ? price.toString() : "0")
-            payload.append("description", description || "")
-            payload.append("category", category || "")
+            payload.append("nama_pelanggan", nama_pelanggan || "")
+            payload.append("telepon", telepon  || "")
+            payload.append("gender", gender || "")
+            payload.append("alamat", alamat || "")
             if (file !== null) payload.append("picture", file || "")
             const response = await put(url, payload, TOKEN);
-            const data: { status: boolean; message: string } = response.data as { status: boolean; message: string };
+            const data = response as { status: boolean; message: string };
             if (data?.status) {
                 setIsShow(false)
-                toast(data?.message, { hideProgressBar: true, containerId: `toastMenu`, type: `success` })
+                toast(data?.message, { hideProgressBar: true, containerId: `toastUser`, type: `success`, autoClose: 2000 })
                 setTimeout(() => router.refresh(), 1000)
             } else {
-                toast(data?.message, { hideProgressBar: true, containerId: `toastMenu`, type: `warning` })
+                toast(data?.message, { hideProgressBar: true, containerId: `toastUser`, type: `warning`, autoClose: 2000 })
             }
         } catch (error) {
             console.log(error);
-            toast(`Something Wrong`, { hideProgressBar: true, containerId: `toastMenu`, type: `error` })
+            toast(`Something Wrong`, { hideProgressBar: true, containerId: `toastUser`, type: `error`, autoClose: 2000 })
         }
     }
 
     return (
         <div>
-            <ToastContainer containerId={`toastMenu`} />
+            <ToastContainer containerId={`toastUser`} />
             <ButtonInfo type="button" onClick={() => openModal()}>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4">
                     <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
@@ -65,7 +65,7 @@ const EditMenu = ({ selectedMenu }: { selectedMenu: IMenu }) => {
                     <div className="sticky top-0 bg-white px-5 pt-5 pb-3 shadow">
                         <div className="w-full flex items-center">
                             <div className="flex flex-col">
-                                <strong className="font-bold text-2xl text-black">Update Menu</strong>
+                                <strong className="font-bold text-2xl text-black">Update User</strong>
                                 <small className="text-slate-400 text-sm">Managers can update both Cashier and Manager roles on this page.</small>
                             </div>
                             <div className="ml-auto">
@@ -81,29 +81,27 @@ const EditMenu = ({ selectedMenu }: { selectedMenu: IMenu }) => {
 
                     {/* modal body */}
                     <div className="p-5 text-black">
-                        <InputGroupComponent id={`name`} type="text" value={menu.name}
-                            onChange={val => setMenu({ ...menu, name: val })}
-                            required={true} label="Name" />
+                        <InputGroupComponent id={`nama_pelanggan`} type="text" value={user.nama_pelanggan}
+                            onChange={val => setUser({ ...user, nama_pelanggan: val })}
+                            required={true} label="Nama Pelanggan" />
 
-                        <InputGroupComponent id={`price`} type="number" value={menu.price.toString()}
-                            onChange={val => setMenu({ ...menu, price: Number(val) })}
-                            required={true} label="Price" />
+                        <InputGroupComponent id={`alamat`} type="text" value={user.alamat}
+                            onChange={val => setUser({ ...user, alamat: val })}
+                            required={true} label="alamat" />
 
-                        <InputGroupComponent id={`description`} type="text" value={menu.description}
-                            onChange={val => setMenu({ ...menu, description: val })}
-                            required={true} label="Description" />
+                        <InputGroupComponent id={`telepon`} type="text" value={user.telepon}
+                            onChange={val => setUser({ ...user, telepon: val })}
+                            required={true} label="Telepon" />
 
-                        <Select id={`category`} value={menu.category} label="Category"
-                            required={true} onChange={val => setMenu({ ...menu, category: val })}>
-                            <option value="">--- Select Category ---</option>
-                            <option value="FOOD">Food</option>
-                            <option value="SNACK">Snack</option>
-                            <option value="DRINK">Drink</option>
+                        <Select id={`gender`} value={user.gender} label="Gender"
+                            required={true} onChange={val => setUser({ ...user, gender: val })}>
+                            <option value="">--- Select Gender ---</option>
+                            <option value="PRIA">PRIA</option>
+                            <option value="WANITA">WANITA</option>
                         </Select>
 
                         <FileInput acceptTypes={["application/pdf", "image/png", "image/jpeg", "image/jpg"]} id="profile_picture"
-                            label="Unggah Foto (Max 2MB, PDF/JPG/JPEG/PNG)" onChange={f => setFile(f)} required={false} />
-
+                            label="Upload Picture (Max 2MB, PDF/JPG/JPEG/PNG)" onChange={f => setFile(f)} required={false} />
                     </div>
                     {/* end modal body */}
 
@@ -125,7 +123,7 @@ const EditMenu = ({ selectedMenu }: { selectedMenu: IMenu }) => {
     )
 
 }
-export default EditMenu
+export default EditUser
 
 
 

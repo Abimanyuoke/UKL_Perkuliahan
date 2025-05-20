@@ -6,6 +6,7 @@ import path from 'path'
 
 import UserRoute from './routers/userRoute'
 import NasabahRoute from './routers/nasabahRoute'
+import MatkulRoute from './routers/matkulRoute'
 
 import { PORT } from './global'
 
@@ -43,8 +44,9 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsDoc(swaggerOptions)
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 
-app.use(`/`, UserRoute)
+app.use(`/user`, UserRoute)
 app.use(`/`, NasabahRoute)
+app.use(`/`, MatkulRoute)
 
 // Set public folder as static
 app.use(express.static(path.join(__dirname, '..', 'public')));

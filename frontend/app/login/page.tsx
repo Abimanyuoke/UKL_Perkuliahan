@@ -12,15 +12,15 @@ import { GiPadlock } from "react-icons/gi";
 import { ArrowLeft } from "lucide-react"
 
 const LoginPage = () => {
-    const [email, setEmail] = useState<string>("")
+    const [username, setUsername] = useState<string>("")
     const [password, setPassword] = useState<string>("")
     const [showPassword, setShowPassword] = useState<boolean>(false)
     const router = useRouter()
     const handleSubmit = async (e: FormEvent) => {
         try {
             e.preventDefault()
-            const url = `${BASE_API_URL}/user/login`
-            const payload = JSON.stringify({ email: email, password })
+            const url = `${BASE_API_URL}/login`
+            const payload = JSON.stringify({ username: username, password })
             const { data } = await axios.post<{ status: boolean; message: string; token: string; data?: { id: string; name: string; role: string; profile_picture?: string } }>(url, payload, {
                 headers: { "Content-Type": "application/json" }
             })
@@ -30,11 +30,7 @@ const LoginPage = () => {
                 if (data.data) {
                     storeCookie("id", data.data.id)
                     storeCookie("name", data.data.name)
-                    storeCookie("role", data.data.role)
                     storeCookie("profile_picture", data.data.profile_picture || "")
-                    let role = data.data.role
-                    if (role === `MANAGER`) setTimeout(() => router.replace(`/manager/dashboard`), 1000)
-                    else if (role === `CASHIER`) setTimeout(() => router.replace(`/cashier/home`), 1000)
                 }
             }
             else toast(data.message, { hideProgressBar: true, containerId: `toastLogin`, type: "warning" })
@@ -74,8 +70,8 @@ const LoginPage = () => {
                             <div className="bg-primary rounded-l-md p-3">
                                 <MdOutlineEmail className="text-[#333333] text-xl" />
                             </div>
-                            <input type="text" className="border p-2 grow rounded-r-md focus:outline-none focus:ring-primary focus:border-primary" value={email}
-                                onChange={e => setEmail(e.target.value)} placeholder="Email" id={email} />
+                            <input type="text" className="border p-2 grow rounded-r-md focus:outline-none focus:ring-primary focus:border-primary" value={username}
+                                onChange={e => setUsername(e.target.value)} placeholder="Username" id={username} />
                         </div>
 
                         <div className="flex w-full my-4">
