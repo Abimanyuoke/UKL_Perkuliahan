@@ -10,14 +10,14 @@ import jwt from "jsonwebtoken"
 
 const prisma = new PrismaClient({ errorFormat: "pretty" })
 
-export const getAllUsers = async (request: Request, response: Response) => {
+export const getAllNasabah = async (request: Request, response: Response) => {
     try {
         /** get requested data (data has been sent from request) */
         const { search } = request.query
 
         /** process to get user, contains means search name of user based on sent keyword */
-        const allUser = await prisma.user.findMany({
-            where: { nama_pelanggan: { contains: search?.toString() || "" } }
+        const allUser = await prisma.nasabah.findMany({
+            where: { name: { contains: search?.toString() || "" } }
         })
 
         return response.json({
@@ -35,7 +35,7 @@ export const getAllUsers = async (request: Request, response: Response) => {
     }
 }
 
-export const getUserById = async (request: Request, response: Response) => {
+export const getNasabahById = async (request: Request, response: Response) => {
     try {
         /** get requested data (data has been sent from request) */
         const { id } = request.body.user
@@ -69,15 +69,19 @@ export const getUserById = async (request: Request, response: Response) => {
     }
 }
 
-export const createUser = async (request: Request, response: Response) => {
+export const createNasabah = async (request: Request, response: Response) => {
     try {
         /** get requested data (data has been sent from request) */
-        const { nama_pelanggan, alamat, gender, telepon } = request.body
+        const { name, username, email, password, telepon, alamat, gender } = request.body
         const uuid = uuidv4()
 
+        /** variable filename use to define of uploaded file name */
+        let filename = ""
+        if (request.file) filename = request.file.filename /** get file name of uploaded file */
+
         /** process to save new user */
-        const newUser = await prisma.user.create({
-            data: { uuid, nama_pelanggan, alamat, gender, telepon }
+        const newUser = await prisma.nasabah.create({
+            data: { uuid, name, email, password: md5(password), gender, profile_picture: filename, telepon, alamat, username }
         })
 
         return response.json({
@@ -95,7 +99,7 @@ export const createUser = async (request: Request, response: Response) => {
     }
 }
 
-// export const createUser = async (request: Request, response: Response) => {
+// export const createNasabah = async (request: Request, response: Response) => {
 //     try {
 //         const { name, email, password, gender } = request.body
 //         const uuid = uuidv4()
@@ -107,6 +111,7 @@ export const createUser = async (request: Request, response: Response) => {
 //             data: {
 //                 uuid,
 //                 name,
+//                 username,
 //                 email,
 //                 password: md5(password),
 //                 gender,
@@ -145,44 +150,57 @@ export const createUser = async (request: Request, response: Response) => {
 //     }
 // }
 
-export const updateUser = async (request: Request, response: Response) => {
-    try {
-        /** get id of user's id that sent in parameter of URL */
-        const { id } = request.params
-        /** get requested data (data has been sent from request) */
-        const { nama_pelanggan, alamat, gender, telepon } = request.body
+// export const updateUser = async (request: Request, response: Response) => {
+//     try {
+//         /** get id of user's id that sent in parameter of URL */
+//         const { id } = request.params
+//         /** get requested data (data has been sent from request) */
+//         const { name, email, password, gender } = request.body
 
-        /** make sure that data is exists in database */
-        const findUser = await prisma.user.findFirst({ where: { id: Number(id) } })
-        if (!findUser) return response
-            .status(200)
-            .json({ status: false, message: `user is not found` })
+//         /** make sure that data is exists in database */
+//         const findUser = await prisma.user.findFirst({ where: { id: Number(id) } })
+//         if (!findUser) return response
+//             .status(200)
+//             .json({ status: false, message: `user is not found` })
 
-        /** process to update user's data */
-        const updatedUser = await prisma.user.update({
-            data: {
-                nama_pelanggan: nama_pelanggan || findUser.nama_pelanggan,
-                alamat: alamat || findUser.alamat,
-                telepon: telepon || findUser.telepon,
-                gender: gender || findUser.gender,
-            },
-            where: { id: Number(id) }
-        })
+//         /** default value filename of saved data */
+//         let filename = findUser.profile_picture
+//         if (request.file) {
+//             /** update filename by new uploaded picture */
+//             filename = request.file.filename
+//             /** check the old picture in the folder */
+//             let path = `${BASE_URL}/../public/profile_picture/${findUser.profile_picture}`
+//             let exists = fs.existsSync(path)
+//             /** delete the old exists picture if reupload new file */
+//             if(exists && findUser.profile_picture !== ``) fs.unlinkSync(path)
+//         }
 
-        return response.json({
-            status: true,
-            data: updatedUser,
-            message: `user has updated`
-        }).status(200)
-    } catch (error) {
-        return response
-            .json({
-                status: false,
-                message: `There is an error. ${error}`
-            })
-            .status(400)
-    }
-}
+//         /** process to update user's data */
+//         const updatedUser = await prisma.user.update({
+//             data: {
+//                 name: name || findUser.name,
+//                 email: email || findUser.email,
+//                 password: password ? md5(password) : findUser.password,
+//                 gender: gender || findUser.gender,
+//                 profile_picture: filename
+//             },
+//             where: { id: Number(id) }
+//         })
+
+//         return response.json({
+//             status: true,
+//             data: updatedUser,
+//             message: `user has updated`
+//         }).status(200)
+//     } catch (error) {
+//         return response
+//             .json({
+//                 status: false,
+//                 message: `There is an error. ${error}`
+//             })
+//             .status(400)
+//     }
+// }
 
 // export const changePicture = async (request: Request, response: Response) => {
 //     try {
@@ -260,44 +278,46 @@ export const updateUser = async (request: Request, response: Response) => {
 //     }
 // }
 
-// export const authentication = async (request: Request, response: Response) => {
-//     try {
-//         const { email, password } = request.body /** get requested data (data has been sent from request) */
+export const authentication = async (request: Request, response: Response) => {
+    try {
+        const { username, password } = request.body /** get requested data (data has been sent from request) */
 
-//         /** find a valid admin based on username and password */
-//         const findUser = await prisma.user.findFirst({
-//             where: { email, password: md5(password) }
-//         })
+        /** find a valid admin based on username and password */
+        const findNasabah = await prisma.nasabah.findFirst({
+            where: { username, password: md5(password) }
+        })
 
-//         /** check is admin exists */
-//         if (!findUser) return response
-//             .status(200)
-//             .json({ status: false, logged: false, message: `Email or password is invalid` })
+        /** check is admin exists */
+        if (!findNasabah) return response
+            .status(200)
+            .json({ status: false, logged: false, message: `Email or password is invalid` })
 
-//         let data = {
-//             id: findUser.id,
-//             name: findUser.name,
-//             email: findUser.email,
-//             gender: findUser.gender,
-//             profile_picture: findUser.profile_picture,
-//         }
+        let data = {
+            id: findNasabah.id,
+            name: findNasabah.name,
+            username: findNasabah.username,
+            password: findNasabah.password,
+            email: findNasabah.email,
+            gender: findNasabah.gender,
+            profile_picture: findNasabah.profile_picture,
+        }
 
-//         /** define payload to generate token */
-//         let payload = JSON.stringify(data)
+        /** define payload to generate token */
+        let payload = JSON.stringify(data)
 
-//         /** generate token */
-//         let token = sign(payload, SECRET || "joss")
+        /** generate token */
+        let token = sign(payload, SECRET || "joss")
 
-//         return response
-//             .status(200)
-//             .json({ status: true, logged: true, data: data, message: `Login Success`, token })
-//     } catch (error) {
-//         return response
-//             .json({
-//                 status: false,
-//                 message: `There is an error. ${error}`
-//             })
-//             .status(400)
-//     }
-// }
+        return response
+            .status(200)
+            .json({ status: true, logged: true, data: data, message: `Login Success`, token })
+    } catch (error) {
+        return response
+            .json({
+                status: false,
+                message: `There is an error. ${error}`
+            })
+            .status(400)
+    }
+}
 

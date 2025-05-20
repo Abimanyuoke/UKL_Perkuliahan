@@ -24,14 +24,26 @@ CREATE TABLE `MatKul` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `uuid` VARCHAR(191) NOT NULL DEFAULT '',
     `name_matkul` VARCHAR(191) NOT NULL DEFAULT '',
-    `SKS` INTEGER NOT NULL DEFAULT 0,
+    `sks` INTEGER NOT NULL DEFAULT 0,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
-    `userId` INTEGER NOT NULL,
 
     UNIQUE INDEX `MatKul_uuid_key`(`uuid`),
+    UNIQUE INDEX `MatKul_name_matkul_key`(`name_matkul`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `PilihanMatkul` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `usernameId` INTEGER NOT NULL,
+    `matkulId` INTEGER NOT NULL,
+
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `MatKul` ADD CONSTRAINT `MatKul_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `PilihanMatkul` ADD CONSTRAINT `PilihanMatkul_usernameId_fkey` FOREIGN KEY (`usernameId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `PilihanMatkul` ADD CONSTRAINT `PilihanMatkul_matkulId_fkey` FOREIGN KEY (`matkulId`) REFERENCES `MatKul`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

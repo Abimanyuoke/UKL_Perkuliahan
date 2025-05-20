@@ -1,20 +1,19 @@
 import express from "express"
-import { getAllUsers, createUser, updateUser, deleteUser, changePicture, authentication, getUserById } from "../controllers/userController"
+import { getAllUsers, createUser, updateUser,  getUserById } from "../controllers/userController"
 import { verifyAddUser, verifyEditUser, verifyAuthentication } from "../middlewares/userValidation"
-import uploadFile from "../middlewares/profilUpload"
 import { verifyToken, verifyRole } from "../middlewares/authorization"
 
 const app = express()
 app.use(express.json())
 
-app.get(`/`, [verifyToken, verifyRole(["MANAGER"])], getAllUsers)
-app.get(`/profile`, [verifyToken, verifyRole(["CASHIER", "MANAGER"])], getUserById)
-app.post(`/`, uploadFile.single("picture"), verifyAddUser, createUser)
+app.get(`/`, getAllUsers)
+app.get(`/api/profil/:id`, getUserById)
+app.post(`/api/adduser`,  verifyAddUser, createUser)
 // app.post(`/`, [verifyToken, verifyRole(["MANAGER"]), uploadFile.single("picture"), verifyAddUser], createUser)
-app.put(`/:id`, [verifyToken, verifyRole(["CASHIER", "MANAGER"]), uploadFile.single("picture"), verifyEditUser], updateUser)
-app.put(`/profile/:id`, [verifyToken, verifyRole(["CASHIER", "MANAGER"]), uploadFile.single("picture")], changePicture)
-app.delete(`/:id`, [verifyToken, verifyRole(["MANAGER"])], deleteUser)
-app.post(`/login`, [verifyAuthentication], authentication)
+app.put(`/update/:id`,  verifyEditUser, updateUser)
+// app.put(`/profile/:id`, [verifyToken, verifyRole(["CASHIER", "MANAGER"]), uploadFile.single("picture")], changePicture)
+// app.delete(`/:id`, [verifyToken, verifyRole(["MANAGER"])], deleteUser)
+// app.post(`/login`, [verifyAuthentication], authentication)
 
 export default app
 

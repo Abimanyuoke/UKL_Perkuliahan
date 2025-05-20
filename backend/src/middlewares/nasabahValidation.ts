@@ -3,25 +3,33 @@ import Joi from 'joi'
 
 /** create schema when add new menu's data, all of fileds have to be required */
 const addDataSchema = Joi.object({
-    nama_pelanggan: Joi.string().required(),
+    name: Joi.string().required(),
+    username: Joi.string().required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().min(3).alphanum().required(),
     telepon: Joi.string().alphanum().required(),
     alamat: Joi.string().required(),
     gender: Joi.string().valid('PRIA', 'WANITA').uppercase().required(),
+    profile_picture: Joi.allow().optional(),
     user: Joi.optional()
 })
 
 /** create schema when edit new menu's data, all of fileds have to be required */
 const editDataSchema = Joi.object({
-    nama_pelanggan: Joi.string().required(),
+    name: Joi.string().required(),
+    username: Joi.string().required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().min(3).alphanum().required(),
     telepon: Joi.string().alphanum().required(),
     alamat: Joi.string().required(),
     gender: Joi.string().valid('PRIA', 'WANITA').uppercase().required(),
+    profile_picture: Joi.allow().optional(),
     user: Joi.optional()
 })
 
 /** create schema when authentication */
 const authSchema = Joi.object({
-    email: Joi.string().email().required(),
+    username: Joi.string().required(),  
     password: Joi.string().min(3).alphanum().required(),
 })
 

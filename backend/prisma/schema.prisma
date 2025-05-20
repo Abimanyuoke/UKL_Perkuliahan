@@ -13,7 +13,7 @@ enum Gender {
 }
 
 
-model User {
+model Nasabah {
   id              Int      @id @default(autoincrement())
   uuid            String   @unique @default("")
   name            String   @default("")
@@ -26,15 +26,29 @@ model User {
   gender          Gender   @default(PRIA)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  matkul          MatKul[]
+}
+
+model User {
+  id              Int      @id @default(autoincrement())
+  uuid            String   @unique @default("")
+  nama_pelanggan  String   @default("")
+  alamat          String   @default("")
+  gender          Gender   @default(PRIA)
+  telepon         String   @default("")
 }
 model MatKul {
   id          Int      @id @default(autoincrement())
   uuid        String   @unique @default("")
-  name_matkul String   @default("")
-  SKS         Int      @default(0)
+  name_matkul String   @default("") @unique
+  sks         Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  userId      Int
-  user        User     @relation(fields: [userId], references: [id])
+  selectedMatkul SelectedMatkul[]
+}
+
+model SelectedMatkul {
+  id        Int    @id @default(autoincrement())
+  matkulId  Int
+  matkul    MatKul?  @relation(fields: [matkulId], references: [id])
+  createdAt DateTime @default(now())
 }
